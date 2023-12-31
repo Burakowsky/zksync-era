@@ -70,7 +70,7 @@ pub fn get_approval_based_paymaster_input_for_estimation(
 pub fn get_general_paymaster_input(paymaster: Address, inner_input: Vec<u8>) -> PaymasterParams {
     let paymaster_contract = load_contract(IPAYMASTER_FLOW_INTERFACE);
     let paymaster_input = paymaster_contract
-        .function("general")
+        .function("general") // functıon ıs clear.
         .unwrap()
         .encode_input(&[Token::Bytes(inner_input)])
         .unwrap();

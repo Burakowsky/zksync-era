@@ -5,7 +5,7 @@ use zksync_types::{
 
 use crate::{
     error::ClientError, operations::SyncTransactionHandle, wallet::Wallet, EthNamespaceClient,
-    ZksNamespaceClient,
+    ZksNamespaceClient, // hello //  
 };
 
 pub struct ExecuteContractBuilder<'a, S: EthereumSigner, P> {

@@ -9,7 +9,7 @@ use zksync_types::{
 };
 
 pub use self::{
-    deploy_contract::DeployContractBuilder,
+    deploy_contract::DeployContractBuilder, 
     execute_contract::ExecuteContractBuilder,
     transfer::{create_transfer_calldata, TransferBuilder},
     withdraw::WithdrawBuilder,

@@ -4,7 +4,7 @@ pub use zksync_web3_decl::{
     namespaces::{EthNamespaceClient, NetNamespaceClient, Web3NamespaceClient, ZksNamespaceClient},
     types,
 };
- //Hello world//
+ 
 pub use crate::{ethereum::EthereumProvider, wallet::Wallet};
 
 pub mod error;
