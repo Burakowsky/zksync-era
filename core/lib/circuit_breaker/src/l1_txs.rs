@@ -1,28 +1,17 @@
+// Importing the ConnectionPool from the zksync_dal crate.
 use zksync_dal::ConnectionPool;
 
+// Importing CircuitBreaker and CircuitBreakerError from the current crate.
 use crate::{CircuitBreaker, CircuitBreakerError};
 
+// Define a struct named FailedL1TransactionChecker which holds a ConnectionPool.
 #[derive(Debug)]
 pub struct FailedL1TransactionChecker {
     pub pool: ConnectionPool,
 }
 
+// Implementing the CircuitBreaker trait for FailedL1TransactionChecker.
 #[async_trait::async_trait]
 impl CircuitBreaker for FailedL1TransactionChecker {
-    async fn check(&self) -> Result<(), CircuitBreakerError> {
-        if self
-            .pool
-            .access_storage()
-            .await
-            .unwrap()
-            .eth_sender_dal()
-            .get_number_of_failed_transactions()
-            .await
-            .unwrap()
-            > 0
-        {
-            return Err(CircuitBreakerError::FailedL1Transaction);
-        }
-        Ok(())
-    }
-}
+    // Implementing the check method defined in
+
