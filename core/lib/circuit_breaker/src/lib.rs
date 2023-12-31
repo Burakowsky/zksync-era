@@ -1,15 +1,17 @@
+// Import necessary crates and modules.
 use std::time::Duration;
-
 use anyhow::Context as _;
 use futures::channel::oneshot;
 use thiserror::Error;
 use tokio::sync::watch;
 use zksync_config::configs::chain::CircuitBreakerConfig;
 
+// Import modules from other files.
 pub mod l1_txs;
 pub mod replication_lag;
 pub mod utils;
 
+// Define an error enum for CircuitBreaker errors.
 #[derive(Debug, Error)]
 pub enum CircuitBreakerError {
     #[error("System has failed L1 transaction")]
@@ -18,19 +20,21 @@ pub enum CircuitBreakerError {
     ReplicationLag(u32, u32),
 }
 
-/// Checks circuit breakers
+/// Structure for checking circuit breakers.
 #[derive(Debug)]
 pub struct CircuitBreakerChecker {
     circuit_breakers: Vec<Box<dyn CircuitBreaker>>,
     sync_interval: Duration,
 }
 
+// Trait defining the behavior of a CircuitBreaker.
 #[async_trait::async_trait]
 pub trait CircuitBreaker: std::fmt::Debug + Send + Sync {
     async fn check(&self) -> Result<(), CircuitBreakerError>;
 }
 
 impl CircuitBreakerChecker {
+    // Constructor function for CircuitBreakerChecker.
     pub fn new(
         circuit_breakers: Vec<Box<dyn CircuitBreaker>>,
         config: &CircuitBreakerConfig,
@@ -41,31 +45,8 @@ impl CircuitBreakerChecker {
         }
     }
 
+    // Check function to iterate through circuit breakers and perform checks.
     pub async fn check(&self) -> Result<(), CircuitBreakerError> {
         for circuit_breaker in &self.circuit_breakers {
-            circuit_breaker.check().await?;
-        }
-        Ok(())
-    }
+            circuit_breaker.
 
-    pub async fn run(
-        self,
-        circuit_breaker_sender: oneshot::Sender<CircuitBreakerError>,
-        stop_receiver: watch::Receiver<bool>,
-    ) -> anyhow::Result<()> {
-        tracing::info!("running circuit breaker checker...");
-        loop {
-            if *stop_receiver.borrow() {
-                break;
-            }
-            if let Err(error) = self.check().await {
-                return circuit_breaker_sender
-                    .send(error)
-                    .ok()
-                    .context("failed to send circuit breaker messsage");
-            }
-            tokio::time::sleep(self.sync_interval).await;
-        }
-        Ok(())
-    }
-}
