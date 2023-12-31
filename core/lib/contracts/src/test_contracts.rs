@@ -1,10 +1,15 @@
+// Import necessary modules to use types and structures from the `ethabi` library
 use ethabi::{ethereum_types::U256, Bytes, Token};
+// Import the `Deserialize` trait from the Serde library
 use serde::Deserialize;
 
+// Import the `get_loadnext_contract` function from the current module
 use crate::get_loadnext_contract;
 
+// Define a structure named `LoadnextContractExecutionParams`
 #[derive(Debug, Clone, Deserialize)]
 pub struct LoadnextContractExecutionParams {
+    // Define parameters required for an Ethereum smart contract function
     pub reads: usize,
     pub writes: usize,
     pub events: usize,
@@ -13,11 +18,14 @@ pub struct LoadnextContractExecutionParams {
     pub deploys: usize,
 }
 
+// Implement methods for the `LoadnextContractExecutionParams` structure
 impl LoadnextContractExecutionParams {
+    // Method to retrieve values from environment variables with a specific prefix
     pub fn from_env() -> Option<Self> {
         envy::prefixed("CONTRACT_EXECUTION_PARAMS_").from_env().ok()
     }
 
+    // Method to create an empty `LoadnextContractExecutionParams` structure
     pub fn empty() -> Self {
         Self {
             reads: 0,
@@ -30,35 +38,7 @@ impl LoadnextContractExecutionParams {
     }
 }
 
+// Define default values for the `LoadnextContractExecutionParams` structure
 impl Default for LoadnextContractExecutionParams {
-    fn default() -> Self {
-        Self {
-            reads: 10,
-            writes: 10,
-            events: 10,
-            hashes: 10,
-            recursive_calls: 1,
-            deploys: 1,
-        }
-    }
-}
+    fn default(
 
-impl LoadnextContractExecutionParams {
-    pub fn to_bytes(&self) -> Bytes {
-        let loadnext_contract = get_loadnext_contract();
-        let contract_function = loadnext_contract.contract.function("execute").unwrap();
-
-        let params = vec![
-            Token::Uint(U256::from(self.reads)),
-            Token::Uint(U256::from(self.writes)),
-            Token::Uint(U256::from(self.hashes)),
-            Token::Uint(U256::from(self.events)),
-            Token::Uint(U256::from(self.recursive_calls)),
-            Token::Uint(U256::from(self.deploys)),
-        ];
-
-        contract_function
-            .encode_input(&params)
-            .expect("failed to encode parameters")
-    }
-}
